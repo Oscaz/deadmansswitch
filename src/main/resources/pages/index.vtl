@@ -101,7 +101,16 @@
                         })
                     }
                 });
-
+            } else if (buttonId.localeCompare("deadswitches") === 0) {
+                swal({
+                    title: "Success!",
+                    text: "Sending you through...",
+                    icon: "success",
+                    button: "Processing..."
+                });
+                setTimeout(function () {
+                    window.location.href = window.location.href.replace("deadmansswitch", buttonId);
+                }, 500);
             }
         }
     </script>
@@ -130,10 +139,18 @@
         </div>
         <br>
         <div style="display:inline-block">
-            <button id="createswitch" type="button" class="btn btn-primary" onclick="onClick(this.id)">Create a switch</button>
-            <button id="checkswitch" type="button" class="btn btn-success" onclick="onClick(this.id)">Check into a switch</button>
-            <button id="deleteswitch" type="button" class="btn btn-danger" onclick="onClick(this.id)">Delete a switch</button>
-            <button id="viewswitch" type="button" class="btn btn-info" onclick="onClick(this.id)">View dead switches</button>
+            <span style="padding-right: 15px; padding-left: 15px;">
+                <button id="createswitch" type="button" class="btn btn-primary" onclick="onClick(this.id)">Create a switch</button>
+            </span>
+            <span style="padding-right: 15px; padding-left: 15px;">
+                <button id="checkswitch" type="button" class="btn btn-success" onclick="onClick(this.id)">Check into a switch</button>
+            </span>
+            <span style="padding-right: 15px; padding-left: 15px;">
+                <button id="deleteswitch" type="button" class="btn btn-danger" onclick="onClick(this.id)">Delete a switch</button>
+            </span>
+            <span style="padding-right: 15px; padding-left: 15px;">
+                <button id="deadswitches" type="button" class="btn btn-info" onclick="onClick(this.id)">View dead switches</button>
+            </span>
         </div>
     </div>
 </body>

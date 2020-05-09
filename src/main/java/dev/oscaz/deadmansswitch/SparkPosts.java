@@ -1,5 +1,6 @@
 package dev.oscaz.deadmansswitch;
 
+import com.google.gson.Gson;
 import dev.oscaz.deadmansswitch.pojo.LiveMansSwitch;
 import dev.oscaz.deadmansswitch.pojo.NewSwitchMessage;
 import spark.Spark;
@@ -30,6 +31,18 @@ public class SparkPosts {
             SwitchGulag.addSwitch(liveMansSwitch);
 
             return liveMansSwitch.getAuthKey();
+        });
+
+        Spark.post("/dead-switches/", (request, response) -> {
+            return DeadMansSwitch.GSON.toJson(SwitchGulag.getDeadSwitches());
+        });
+
+        Spark.post("/dead-switch-info/", (request, response) -> {
+            try {
+                return DeadMansSwitch.GSON.toJson(SwitchGulag.getDeadSwitch(request.body()));
+            } catch (IllegalArgumentException e) {
+                return 0;
+            }
         });
     }
 

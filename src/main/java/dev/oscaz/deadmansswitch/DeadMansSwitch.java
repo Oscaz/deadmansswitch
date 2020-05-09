@@ -32,6 +32,8 @@ public class DeadMansSwitch {
         Spark.get("/createswitch", WebServer.resolve("/createswitch.vtl"));
         Spark.get("/checkswitch", WebServer.resolve("/checkswitch.vtl"));
         Spark.get("/switchview", WebServer.resolve("/switchview.vtl"));
+        Spark.get("/deadswitches", WebServer.resolve("/deadswitches.vtl"));
+        Spark.get("/deadswitchview", WebServer.resolve("/deadswitchview.vtl"));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             FileHandler.saveLiveSwitches(SwitchGulag.getLiveSwitchMap());

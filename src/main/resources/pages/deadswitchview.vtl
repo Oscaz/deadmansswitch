@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>
+
+        getCookie = function(name) {
+            let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return match[2];
+            return undefined;
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const authKey = urlParams.get('authKey');
+
+        if (authKey === undefined || !authKey || !authKey.localeCompare("undefined")) {
+            Swal.fire({
+                title: "Error!",
+                text: "Your switch key was not valid.",
+                icon: "error",
+                button: "Ok"
+            });
+            setTimeout(function () {
+                window.location.href = window.location.href.replace("deadswitchview", "deadswitches");
+            }, 500);
+        } else {
+            let switchInfoRequest = new XMLHttpRequest();
+            switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/dead-switch-info/", false);
+            switchInfoRequest.send( authKey );
+
+            let foundSwitchRaw = switchInfoRequest.responseText;
+
+            if (!foundSwitchRaw || !foundSwitchRaw.localeCompare("0") || !foundSwitchRaw.localeCompare("null")) {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Your switch key was not valid.",
+                    icon: "error",
+                    button: "Ok"
+                });
+                setTimeout(function () {
+                    window.location.href = window.location.href.replace("deadswitchview", "deadswitches");
+                }, 500);
+            } else {
+                let foundSwitch = JSON.parse(foundSwitchRaw);
+                document.onready = function () {
+                    document.getElementById("owner").innerText = foundSwitch.name;
+                    document.getElementById("created").innerText = new Date(foundSwitch.creationTime.seconds * 1000).toDateString() + " " + new Date(foundSwitch.creationTime.seconds * 1000).toTimeString().split(" GMT")[0];
+                    document.getElementById("last").innerText = new Date(foundSwitch.lastCheckIn.seconds * 1000).toDateString() + " " + new Date(foundSwitch.lastCheckIn.seconds * 1000).toTimeString().split(" GMT")[0];
+
+                    let seconds = foundSwitch.checkInDuration.seconds;
+                    let deathDate = new Date((foundSwitch.lastCheckIn.seconds + seconds) * 1000);
+
+                    document.getElementById("death").innerText = deathDate.toDateString() + " " + deathDate.toTimeString().split(" GMT")[0];
+
+                    document.getElementById("textArea").innerText = foundSwitch.data;
+
+                    $("#textArea").bind('input propertychange', function () {
+                        document.getElementById("textArea").innerText = foundSwitch.data;
+                    });
+                };
+            }
+        }
+    </script>
+</head>
+<body>
+<div style="text-align: center;">
+    <div style="display: inline-block; width:45%">
+        <span style="padding-top: 5px; float:left">
+            <h3>Switch owner</h3>
+            <span id="owner"></span>
+        </span>
+        <span style="padding-top: 5px; float:right">
+            <h3>Switch created on</h3>
+            <span id="created"></span>
+        </span>
+    </div>
+    <br>
+    <div style="display: inline-block; width:45%; padding-top: 25px">
+        <span style="padding-top: 5px; float:left">
+            <h3>Last Check in</h3>
+            <span id="last"></span>
+        </span>
+        <span style="padding-top: 5px; float:right">
+            <h3>Time of death</h3>
+            <span id="death"></span>
+        </span>
+    </div>
+    <br>
+    <div class="form-group" id="textAreaDiv" style="display: inline-block; width: 45%; padding-top: 25px;">
+        <label for="textArea">Switch information</label>
+        <textarea class="form-control" id="textArea" rows="5" readonly></textarea>
+    </div>
+    <br>
+    <div id="buttons">
+        <span id="button-defer" style="padding: 25px">
+            <button id="back" type="button" class="btn btn-info" onclick="window.location.href = window.location.href.replace('deadswitchview', 'deadswitches');">Back</button>
+        </span>
+    </div>
+</div>
+</body>
+</html>

@@ -52,4 +52,10 @@ public class SwitchGulag {
         return Collections.unmodifiableList(deadSwitches);
     }
 
+    public static LiveMansSwitch getDeadSwitch(String authKey) {
+        return deadSwitches.parallelStream()
+                .filter(deadSwitch -> deadSwitch.getAuthKey().equalsIgnoreCase(authKey))
+                .findFirst().orElse(null);
+    }
+
 }

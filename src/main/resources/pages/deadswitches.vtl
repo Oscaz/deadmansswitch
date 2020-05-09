@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>
+        let hasLoaded = false;
+        document.onready = function() {
+            if (hasLoaded) return;
+
+            let deadSwitchRequest = new XMLHttpRequest();
+            deadSwitchRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/dead-switches/", false);
+            deadSwitchRequest.send( null );
+
+            let switches = JSON.parse(deadSwitchRequest.responseText);
+
+            let switchCards = document.getElementById("cards");
+
+            hasLoaded = true;
+
+            for(let i = 0; i < switches.length; i++) {
+                let deadSwitch = switches[i];
+
+                console.log(JSON.stringify(deadSwitch));
+
+                let seconds = deadSwitch.checkInDuration.seconds;
+                let deathDate = new Date((deadSwitch.lastCheckIn.seconds + seconds) * 1000);
+
+                let info = deadSwitch.data;
+                let infoString;
+
+                if (info.length > 93) {
+                    infoString = info.substring(0, 93) + "...";
+                } else {
+                    infoString = info;
+                }
+
+                let element = document.createElement("span");
+                element.className = "card";
+                element.style.paddingLeft = "1%";
+                element.style.paddingRight = "1%";
+                element.style.width = "25%";
+                element.style.cssFloat = "left";
+                element.style.display = "inline-block";
+                element.innerHTML = '<span class="card-body">\n' +
+                        '                <h5 class="card-title">' + deadSwitch.name + '</h5>\n' +
+                        '                <h6 class="card-subtitle mb-2 text-muted">Died ' + deathDate.toDateString() + '</h6>\n' +
+                        '                <p class="card-text">' + infoString + '</p>\n' +
+                        '                <a href="/deadswitchview?authKey=' + deadSwitch.authKey + '" class="card-link">View switch</a>\n' +
+                    '                </span>';
+
+                switchCards.appendChild(element);
+            }
+        }
+    </script>
+</head>
+<body>
+<div style="text-align: center;">
+    <div style="display: inline-block; width:80%">
+        <span style="display: inline-block;" class="col-sm d-flex" id="cards">
+            <!--<span class="card" style="width: 22%; padding-left:1%; padding-right:1%; float:left; display:inline-block;">
+              <span class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <a href="#" class="card-link">Card link</a>
+                <a href="#" class="card-link">Another link</a>
+              </span>
+            </span>-->
+        </span>
+    </div>
+</div>
+</body>
+</html>
