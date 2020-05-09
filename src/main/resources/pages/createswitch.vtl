@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>
+        let hasInvalidatedTextArea = false;
+        $(document).ready(function() {
+            for (let i = 1; i <= 60; i++) {
+                let option = document.createElement("option");
+                let optionValue = document.createTextNode("" + i);
+                option.appendChild(optionValue);
+                document.getElementById("periodDropdown").appendChild(option);
+            }
+            $("#textArea").bind('input propertychange', function() {
+                if (!hasInvalidatedTextArea) return;
+                if (document.getElementById("textArea").className.localeCompare("form-control is-invalid") !== 0) {
+                    if (document.getElementById("textArea").value.localeCompare("") === 0) {
+                        document.getElementById("textArea").className += " is-invalid";
+                    }
+                } else {
+                    if (document.getElementById("textArea").value.localeCompare("") !== 0) {
+                        document.getElementById("textArea").className = "form-control";
+                    }
+                }
+            });
+        });
+
+        function onClick(buttonId) {
+
+            if (buttonId.localeCompare("createswitch") !== 0) return;
+            if (document.getElementById("textArea").value.localeCompare("") === 0) {
+                if (document.getElementById("textArea").className.localeCompare("form-control is-invalid") === 0) return;
+                document.getElementById("textArea").className += " is-invalid";
+                hasInvalidatedTextArea = true;
+                return;
+            }
+
+            const intDropdown = document.getElementById("periodDropdown");
+            const durationChosen = intDropdown.options[intDropdown.selectedIndex].text;
+
+            const unitDropdown = document.getElementById("unitDropdown");
+            const unitChosen = unitDropdown.options[unitDropdown.selectedIndex].text;
+
+            let switchInfoRequest = new XMLHttpRequest();
+            switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/new-switch/", false);
+            switchInfoRequest.send( JSON.stringify(
+                {
+                    "contentType": "new-switch",
+                    "name": document.getElementById("inputName").value,
+                    "data": document.getElementById("textArea").value,
+                    "period": durationChosen,
+                    "timeUnit": unitChosen
+                }
+            ));
+
+            let authKey = switchInfoRequest.responseText;
+
+            document.cookie = "authKey=" + authKey + "; max-age=600;";
+            swal({
+                title: "Success!",
+                text: 'Save your authentication key!',
+                icon: "success",
+                button: "I have saved the key."
+            }).then((result) => {
+                window.location.href = window.location.href.replace("createswitch", "switchview");
+            });
+            document.getElementsByClassName("swal-text")[0].innerHTML = 'Save your authentication key! <br>' +
+                '<span style="width: 150%; padding-top:25px;">' +
+                '<textarea class="form-control" id="authKeyText" rows="2">' + authKey + '</textarea>' +
+                '</span>'
+        }
+    </script>
+</head>
+<body>
+<div style="text-align: center;">
+    <div style="display: inline-block; width:40%">
+        <h3 style="padding-top: 5px;">Create a dead man's switch</h3>
+        <div class="form-group" style="width: 50%; display: inline-block">
+            <label for="inputName">Input name (Optional)</label>
+            <input type="text" class="form-control" id="inputName" aria-describedby="nameHelp" placeholder="Anonymous">
+            <small id="nameHelp" class="form-text text-muted">If left blank, will default to Anonymous.</small>
+        </div>
+        <div class="form-group" id="textAreaDiv">
+            <label for="textArea">Switch information</label>
+            <textarea class="form-control" id="textArea" rows="5" required></textarea>
+            <div class="invalid-feedback">Please enter some text.</div>
+        </div>
+        <div class="form-group" style="width: 30%; float:left; padding-left:5%">
+            <label for="periodDropdown">Time period</label>
+            <select class="form-control" id="periodDropdown"></select>
+        </div>
+        <div class="form-group" style="width:30%; float: left; padding-left: 7.5%; padding-right: 7.5%; padding-top: 6.25%;">
+            <button class="btn btn-primary" style="text-align: center" id="createswitch" type="button" onclick="onClick(this.id)">Create switch</button>
+        </div>
+        <div class="form-group" style="width: 30%; float:right; padding-right: 5%">
+            <label for="unitDropdown">Time unit</label>
+            <select class="form-control" id="unitDropdown">
+                <option>Minutes</option>
+                <option>Hours</option>
+                <option>Days</option>
+                <option selected="selected">Weeks</option>
+                <option>Months</option>
+                <option>Years</option>
+            </select>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>
+
+        getCookie = function(name) {
+            let match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return match[2];
+        };
+
+        let authKey = getCookie("authKey");
+
+        let switchInfoRequest = new XMLHttpRequest();
+        switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/switch-info/", false);
+        switchInfoRequest.send( authKey );
+
+        let foundSwitchRaw = switchInfoRequest.responseText;
+
+        if (!foundSwitchRaw || !foundSwitchRaw.localeCompare("0") || !foundSwitchRaw.localeCompare("null")) {
+            swal({
+                title: "Error!",
+                text: "Your switch key was not valid.",
+                icon: "error",
+                button: "Ok"
+            });
+            setTimeout(function () {
+                window.location.href = window.location.href.replace("switchview", "checkswitch");
+            }, 500);
+        } else {
+            let foundSwitch = JSON.parse(foundSwitchRaw);
+            document.onready = function () {
+                document.getElementById("owner").innerText = foundSwitch.name;
+                document.getElementById("created").innerText = new Date(foundSwitch.creationTime.seconds * 1000).toDateString() + " " + new Date(foundSwitch.creationTime.seconds * 1000).toTimeString().split(" GMT")[0];
+                document.getElementById("last").innerText = new Date(foundSwitch.lastCheckIn.seconds * 1000).toDateString() + " " + new Date(foundSwitch.lastCheckIn.seconds * 1000).toTimeString().split(" GMT")[0];
+
+                let seconds = foundSwitch.checkInDuration.seconds;
+                let deathDate = new Date((foundSwitch.lastCheckIn.seconds + seconds) * 1000);
+
+                document.getElementById("death").innerText = deathDate.toDateString() + " " + deathDate.toTimeString().split(" GMT")[0];
+
+                document.getElementById("textArea").innerText = foundSwitch.data;
+
+                $("#textArea").bind('input propertychange', function() {
+                    if (document.getElementById("textArea").value.localeCompare(foundSwitch.data) !== 0) {
+                        document.getElementById("button-save").style.padding = "25px";
+                        document.getElementById("button-save").innerHTML = '<button id="save" type="button" class="btn btn-primary" onclick="onClick(this.id)">Save changes</button>';
+                    } else {
+                        document.getElementById("button-save").style.padding = "";
+                        document.getElementById("button-save").innerHTML = "";
+                    }
+                });
+            };
+        }
+
+        onclick = function () {};
+
+        let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+
+        webSocket.onopen = function () {
+            onClick = function (buttonId) {
+                if (!buttonId.localeCompare("save")) {
+                    webSocket.send(JSON.stringify({
+                        "contentType": "edit-switch",
+                        "authKey": authKey,
+                        "newData": document.getElementById("textArea").value
+                    }));
+                    swal({
+                        title: "Success!",
+                        text: "Sending you through...",
+                        icon: "success",
+                        button: "Processing..."
+                    });
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 500);
+                } else if (!buttonId.localeCompare("checkin")) {
+                    webSocket.send(JSON.stringify({
+                        "contentType": "check-in",
+                        "contents": authKey,
+                    }));
+                    swal({
+                        title: "Success!",
+                        text: "Sending you through...",
+                        icon: "success",
+                        button: "Processing..."
+                    });
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 500);
+                } else if (!buttonId.localeCompare("getAuthKey")) {
+
+                    swal({
+                        title: "Info",
+                        text: 'Save your authentication key!',
+                        icon: "info",
+                        button: "I have saved the key."
+                    });
+
+                    document.getElementsByClassName("swal-text")[0].innerHTML = 'Save your authentication key! <br>' +
+                        '<span style="width: 150%; padding-top:25px;">' +
+                        '<textarea class="form-control" id="authKeyText" rows="2">' + authKey + '</textarea>' +
+                        '</span>'
+                } else if (!buttonId.localeCompare("delete")) {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.value) {
+                            let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+
+                            webSocket.onopen = function () {
+                                webSocket.send(JSON.stringify({
+                                    "contentType":"delete-switch",
+                                    "contents":authKey
+                                }));
+
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your switch has been deleted.',
+                                    'success'
+                                );
+                                setTimeout(function () {
+                                    window.location.href = window.location.href.replace("switchview", "deadmansswitch");
+                                }, 1000);
+                            }
+                        }
+                    })
+                } else if (!buttonId.localeCompare("defer")) {
+                    let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+
+                    webSocket.onopen = function () {
+
+                        webSocket.send(JSON.stringify({
+                            "contentType":"defer-switch",
+                            "authKey":authKey,
+                            "period": 1,
+                            "timeUnit":"Weeks"
+                        }));
+
+                        Swal.fire(
+                            'Deferred!',
+                            'Your switch has been deferred.',
+                            'success'
+                        );
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+                    }
+                }
+            }
+        };
+
+    </script>
+</head>
+<body>
+<div style="text-align: center;">
+    <div style="display: inline-block; width:45%">
+        <span style="padding-top: 5px; float:left">
+            <h3>Switch owner</h3>
+            <span id="owner"></span>
+        </span>
+        <span style="padding-top: 5px; float:right">
+            <h3>Switch created on</h3>
+            <span id="created"></span>
+        </span>
+    </div>
+    <br>
+    <div style="display: inline-block; width:45%; padding-top: 25px">
+        <span style="padding-top: 5px; float:left">
+            <h3>Last Check in</h3>
+            <span id="last"></span>
+        </span>
+        <span style="padding-top: 5px; float:right">
+            <h3>Time of death</h3>
+            <span id="death"></span>
+        </span>
+    </div>
+    <br>
+    <div class="form-group" id="textAreaDiv" style="display: inline-block; width: 45%; padding-top: 25px;">
+        <label for="textArea">Switch information</label>
+        <textarea class="form-control" id="textArea" rows="5" required></textarea>
+    </div>
+    <br>
+    <div id="buttons">
+        <span id="button-save"></span>
+        <span id="button-defer" style="padding: 25px">
+            <button id="defer" type="button" class="btn btn-info" onclick="onClick(this.id)">Defer next check in</button>
+        </span>
+        <span id="button-checkin" style="padding: 25px">
+            <button id="checkin" type="button" class="btn btn-success" onclick="onClick(this.id)">Check into switch</button>
+        </span>
+        <span id="button-delete" style="padding: 25px">
+            <button id="delete" type="button" class="btn btn-danger" onclick="onClick(this.id)">Delete switch</button>
+        </span>
+        <span id="button-authkey" style="padding: 25px;">
+            <button id="getAuthKey" type="button" class="btn btn-light" onclick="onClick(this.id)">Get auth key</button>
+        </span>
+    </div>
+</div>
+</body>
+</html>

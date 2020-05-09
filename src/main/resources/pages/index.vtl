@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("button").click(function(event) {
+                var cache = [];
+                console.log("event: " + JSON.stringify(event, function(key, value) {
+                    if (typeof value === 'object' && value !== null) {
+                        if (cache.indexOf(value) !== -1) {
+                            // Duplicate reference found, discard key
+                            return;
+                        }
+                        // Store value in our collection
+                        cache.push(value);
+                    }
+                    return value;
+                }));
+                cache = null; // Enable garbage collection
+
+            });
+        });
+        function onClick(buttonId) {
+            if (buttonId.localeCompare("createswitch") === 0) {
+                swal({
+                    title: "Success!",
+                    text: "Sending you through...",
+                    icon: "success",
+                    button: "Processing..."
+                });
+                setTimeout(function () {
+                    window.location.href = window.location.href.replace("deadmansswitch", buttonId);
+                }, 500);
+            } else if (buttonId.localeCompare("checkswitch") === 0) {
+                swal({
+                    title: "Success!",
+                    text: "Sending you through...",
+                    icon: "success",
+                    button: "Processing..."
+                });
+                setTimeout(function () {
+                    window.location.href = window.location.href.replace("deadmansswitch", buttonId);
+                }, 500);
+            } else if (buttonId.localeCompare("deleteswitch") === 0) {
+
+                Swal.fire({
+                    title: "Enter your auth key.",
+                    icon: "info",
+                    text: "Paste your authentication key below.",
+                    button: "Done",
+                    input: "text"
+                }).then(result => {
+                    let authKey = result.value;
+
+                    let switchInfoRequest = new XMLHttpRequest();
+                    switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/switch-info/", false);
+                    switchInfoRequest.send( authKey );
+
+                    let foundSwitch = switchInfoRequest.responseText;
+                    console.log(foundSwitch);
+
+                    if (!foundSwitch || !foundSwitch.localeCompare("0") || !foundSwitch.localeCompare("null")) {
+                        swal({
+                            title: "Error!",
+                            text: "Your switch key was not valid.",
+                            icon: "error",
+                            button: "Ok"
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.value) {
+
+                                let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+
+                                webSocket.onopen = function () {
+                                    webSocket.send(JSON.stringify({
+                                        "contentType":"delete-switch",
+                                        "contents":authKey
+                                    }));
+
+                                    Swal.fire(
+                                        'Deleted!',
+                                        'Your switch has been deleted.',
+                                        'success'
+                                    );
+                                }
+                            }
+                        })
+                    }
+                });
+
+            }
+        }
+    </script>
+</head>
+<body>
+    <div style="text-align: center;">
+        <div style="display: inline-block; width:40%">
+            <h4 style="padding-top: 5px;">What is a Dead Mans switch?</h4>
+            <p>
+                A Dead Man's switch is a method of protecting yourself by putting valuable
+                or confidential information online, requiring for you to check in periodically
+                by a pre-defined period of time to confirm that you do not wish for it to be released.
+            </p>
+            <h4 style="padding-top: 5px;">How does it work?</h4>
+            <p>
+                You build a new switch, by putting in some information and specifying your check-in
+                duration. You just have to check in periodically and ensure your timer doesn't run out,
+                each time you visit you can refresh your timer to your duration. If you are going to be
+                away for some time, you can even delay your timer for a while. If you no longer need
+                your switch, you can kill it and delete it forever, or edit the information inside of it.
+            </p>
+            <h4 style="padding-top: 5px;">How do I start?</h4>
+            <p>
+                Click below to create your own switch!
+            </p>
+        </div>
+        <br>
+        <div style="display:inline-block">
+            <button id="createswitch" type="button" class="btn btn-primary" onclick="onClick(this.id)">Create a switch</button>
+            <button id="checkswitch" type="button" class="btn btn-success" onclick="onClick(this.id)">Check into a switch</button>
+            <button id="deleteswitch" type="button" class="btn btn-danger" onclick="onClick(this.id)">Delete a switch</button>
+            <button id="viewswitch" type="button" class="btn btn-info" onclick="onClick(this.id)">View dead switches</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="https://buttons.github.io/buttons.js"></script>
+    <script>
+        function onClick(buttonId) {
+            let authKey = document.getElementById("authKey").value;
+
+            let switchInfoRequest = new XMLHttpRequest();
+            switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/switch-info/", false);
+            switchInfoRequest.send( authKey );
+
+            let foundSwitch = switchInfoRequest.responseText;
+            console.log(foundSwitch);
+
+            if (!foundSwitch || !foundSwitch.localeCompare("0") || !foundSwitch.localeCompare("null")) {
+                swal({
+                    title: "Error!",
+                    text: "Your switch key was not valid.",
+                    icon: "error",
+                    button: "Ok"
+                });
+            } else {
+                document.cookie = "authKey=" + authKey + "; max-age=600;";
+                swal({
+                    title: "Success!",
+                    text: "Sending you through...",
+                    icon: "success",
+                    button: "Processing..."
+                });
+                setTimeout(function () {
+                    window.location.href = window.location.href.replace("checkswitch", "switchview");
+                }, 500);
+                console.log(foundSwitch);
+            }
+        }
+    </script>
+</head>
+<body>
+<div style="text-align: center;">
+    <div style="display: inline-block; width:40%">
+        <h3 style="padding-top: 5px;">Check in on a dead man's switch</h3>
+        <input type="text" id="authKey" class="form-control" placeholder="Paste key here" aria-label="Paste key here" aria-describedby="basic-addon1">
+        <br>
+        <button id="checkin" type="button" class="btn btn-primary" onclick="onClick(this.id)">Check into my switch</button>
+    </div>
+</div>
+</body>
+</html>
