@@ -29,7 +29,7 @@
             }, 500);
         } else {
             let switchInfoRequest = new XMLHttpRequest();
-            switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/dead-switch-info/", false);
+            switchInfoRequest.open("POST", "https://" + location.hostname + ":" + location.port + "/dead-switch-info/", false);
             switchInfoRequest.send( authKey );
 
             let foundSwitchRaw = switchInfoRequest.responseText;

@@ -11,7 +11,6 @@ import org.eclipse.jetty.websocket.api.Session;
 
 public enum MessageHandler {
 
-    AUTHENTICATE_HANDLER(AuthenticateHandler.class),
     CHECKIN_HANDLER(CheckinHandler.class),
     EDIT_HANDLER(EditSwitchHandler.class, EditSwitchMessage.class),
     DELETE_HANDLER(DeleteSwitchHandler.class),

@@ -11,7 +11,7 @@
             let authKey = document.getElementById("authKey").value;
 
             let switchInfoRequest = new XMLHttpRequest();
-            switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/switch-info/", false);
+            switchInfoRequest.open("POST", "https://" + location.hostname + ":" + location.port + "/switch-info/", false);
             switchInfoRequest.send( authKey );
 
             let foundSwitch = switchInfoRequest.responseText;

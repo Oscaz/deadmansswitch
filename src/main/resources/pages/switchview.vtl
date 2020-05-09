@@ -28,7 +28,7 @@
             }, 500);
         } else {
             let switchInfoRequest = new XMLHttpRequest();
-            switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/switch-info/", false);
+            switchInfoRequest.open("POST", "https://" + location.hostname + ":" + location.port + "/switch-info/", false);
             switchInfoRequest.send( authKey );
 
             let foundSwitchRaw = switchInfoRequest.responseText;
@@ -71,7 +71,7 @@
                 onclick = function () {
                 };
 
-                let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+                let webSocket = new WebSocket("wss://" + location.hostname + ":" + location.port + "/switch-actions");
 
                 webSocket.onopen = function () {
                     onClick = function (buttonId) {
@@ -126,7 +126,7 @@
                                 confirmButtonText: 'Yes, delete it!'
                             }).then((result) => {
                                 if (result.value) {
-                                    let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+                                    let webSocket = new WebSocket("wss://" + location.hostname + ":" + location.port + "/switch-actions");
 
                                     webSocket.onopen = function () {
                                         webSocket.send(JSON.stringify({
@@ -146,7 +146,7 @@
                                 }
                             })
                         } else if (!buttonId.localeCompare("defer")) {
-                            let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+                            let webSocket = new WebSocket("wss://" + location.hostname + ":" + location.port + "/switch-actions");
 
                             webSocket.onopen = function () {
 

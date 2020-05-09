@@ -12,7 +12,7 @@
             if (hasLoaded) return;
 
             let deadSwitchRequest = new XMLHttpRequest();
-            deadSwitchRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/dead-switches/", false);
+            deadSwitchRequest.open("POST", "https://" + location.hostname + ":" + location.port + "/dead-switches/", false);
             deadSwitchRequest.send( null );
 
             let switches = JSON.parse(deadSwitchRequest.responseText);
@@ -60,7 +60,7 @@
 <body>
 <div style="text-align: center;">
     <div style="display: inline-block; width:80%">
-        <span style="display: inline-block;" class="col-sm d-flex" id="cards">
+        <span style="display: inline-block;" class="d-flex align-content-start flex-wrap" id="cards">
             <!--<span class="card" style="width: 22%; padding-left:1%; padding-right:1%; float:left; display:inline-block;">
               <span class="card-body">
                 <h5 class="card-title">Card title</h5>

@@ -58,7 +58,7 @@
                     let authKey = result.value;
 
                     let switchInfoRequest = new XMLHttpRequest();
-                    switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/switch-info/", false);
+                    switchInfoRequest.open("POST", "https://" + location.hostname + ":" + location.port + "/switch-info/", false);
                     switchInfoRequest.send( authKey );
 
                     let foundSwitch = switchInfoRequest.responseText;
@@ -83,7 +83,7 @@
                         }).then((result) => {
                             if (result.value) {
 
-                                let webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/switch-actions");
+                                let webSocket = new WebSocket("wss://" + location.hostname + ":" + location.port + "/switch-actions");
 
                                 webSocket.onopen = function () {
                                     webSocket.send(JSON.stringify({

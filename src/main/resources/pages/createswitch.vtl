@@ -46,7 +46,7 @@
             const unitChosen = unitDropdown.options[unitDropdown.selectedIndex].text;
 
             let switchInfoRequest = new XMLHttpRequest();
-            switchInfoRequest.open("POST", "http://" + location.hostname + ":" + location.port + "/new-switch/", false);
+            switchInfoRequest.open("POST", "https://" + location.hostname + ":" + location.port + "/new-switch/", false);
             switchInfoRequest.send( JSON.stringify(
                 {
                     "contentType": "new-switch",

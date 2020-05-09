@@ -1,5 +1,11 @@
 package dev.oscaz.deadmansswitch.web;
 
+import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketAdapter;
+import com.neovisionaries.ws.client.WebSocketException;
+import com.neovisionaries.ws.client.WebSocketFactory;
+import dev.oscaz.deadmansswitch.DeadMansSwitch;
+import dev.oscaz.deadmansswitch.pojo.WebSocketMessage;
 import dev.oscaz.deadmansswitch.socket.DeadSocketHandler;
 import dev.oscaz.deadmansswitch.socket.MessageHandler;
 import spark.ModelAndView;
@@ -7,6 +13,9 @@ import spark.Route;
 import spark.Spark;
 import spark.template.velocity.VelocityTemplateEngine;
 
+import javax.net.ssl.SSLContext;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -39,8 +48,8 @@ public class WebServer {
         if (model == null) {
             model = new HashMap<>();
         }
-        model.put("content", "/pages/" + contentPath);
-        return TEMPLATE_ENGINE.render(new ModelAndView(model, "/pages/template/" + templatePath));
+        model.put("content", ("/pages/" + contentPath).replace("//", "/"));
+        return TEMPLATE_ENGINE.render(new ModelAndView(model, ("/pages/template/" + templatePath).replace("//", "/")));
     }
 
     private static Route staticResolve(String path) {
