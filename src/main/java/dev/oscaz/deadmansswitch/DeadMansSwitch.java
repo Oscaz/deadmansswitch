@@ -4,15 +4,12 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.neovisionaries.ws.client.WebSocketException;
 import dev.oscaz.deadmansswitch.io.FileHandler;
 import dev.oscaz.deadmansswitch.socket.LiveSocketConnection;
 import dev.oscaz.deadmansswitch.web.WebServer;
 import org.slf4j.LoggerFactory;
 import spark.Spark;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

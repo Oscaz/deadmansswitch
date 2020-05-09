@@ -57,10 +57,6 @@
                     document.getElementById("death").innerText = deathDate.toDateString() + " " + deathDate.toTimeString().split(" GMT")[0];
 
                     document.getElementById("textArea").innerText = foundSwitch.data;
-
-                    $("#textArea").bind('input propertychange', function () {
-                        document.getElementById("textArea").innerText = foundSwitch.data;
-                    });
                 };
             }
         }
@@ -97,7 +93,7 @@
     <br>
     <div id="buttons">
         <span id="button-defer" style="padding: 25px">
-            <button id="back" type="button" class="btn btn-info" onclick="window.location.href = window.location.href.replace('deadswitchview', 'deadswitches');">Back</button>
+            <button id="back" type="button" class="btn btn-info" onclick="window.location.href = window.location.href.split('?')[0].replace('deadswitchview', 'deadswitches');">Back</button>
         </span>
     </div>
 </div>

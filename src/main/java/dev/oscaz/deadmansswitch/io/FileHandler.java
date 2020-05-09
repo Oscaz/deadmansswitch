@@ -7,22 +7,21 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import dev.oscaz.deadmansswitch.SwitchGulag;
 import dev.oscaz.deadmansswitch.pojo.LiveMansSwitch;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class FileHandler {
 
-    private static final File LIVE_FILE;
-    private static final File DEAD_FILE;
+    public static final File LIVE_FILE;
+    public static final File DEAD_FILE;
 
     static {
         LIVE_FILE = Paths.get(Paths.get(System.getProperty("user.dir")).toString() + "/live_switches.json").toFile();

@@ -40,6 +40,10 @@ public enum MessageHandler {
         }
     }
 
+    public Class<? extends WebSocketMessage> getMessageClass() {
+        return this.messageClass;
+    }
+
     public Class<? extends MessageHandlerAbstract> getClazz() {
         return this.clazz;
     }
