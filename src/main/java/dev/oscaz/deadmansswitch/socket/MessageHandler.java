@@ -77,7 +77,11 @@ public enum MessageHandler {
         if (messageHandler.messageClass == null) {
             messageHandler.getMessageHandler().run(user, message);
         } else {
-            messageHandler.getMessageHandler().run(user, DeadMansSwitch.GSON.fromJson(message.getRawJson(), messageHandler.messageClass));
+            messageHandler.getMessageHandler().run(
+                    user,
+                    DeadMansSwitch.GSON.fromJson(
+                            message.getRawJson(), messageHandler.messageClass)
+            );
         }
     }
 }

@@ -29,7 +29,7 @@ public class WebServer {
 
     // A set of utility methods to resolve a path to a page and merging with Velocity default template (maven dependency)
 
-    public  static Route resolve(String contentPath) {
+    public static Route resolve(String contentPath) {
         return (request, response) -> render(null, "default.vtl", contentPath);
     }
 
