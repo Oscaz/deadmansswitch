@@ -52,6 +52,15 @@ public class SwitchTest {
                         Duration.ofSeconds(60)
                 ).hasBecomeDead()
         );
+        Assert.assertFalse(
+                new LiveMansSwitch(
+                        null,
+                        null,
+                        Instant.now().minusSeconds(60),
+                        Instant.now().minusSeconds(60),
+                        Duration.ofSeconds(61)
+                ).hasBecomeDead()
+        );
     }
 
     @Test

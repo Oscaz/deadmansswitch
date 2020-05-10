@@ -17,7 +17,7 @@ public class SwitchReaperService {
                     .filter(LiveMansSwitch::hasBecomeDead)
                     .collect(Collectors.toList());
             toKill.forEach(SwitchGulag::killSwitch);
-        }, 1, 1, TimeUnit.MINUTES);
+        }, 1, 1, TimeUnit.SECONDS);
     }
 
 }
